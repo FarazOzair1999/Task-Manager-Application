@@ -7,7 +7,7 @@ class TodoService{
     _repository=Repository();
   }
   saveTodo(Todo todo) async{
-    return await _repository.insertData('todos', todo.todoMap());
+    return await _repository.insertData('todos',todo.todoMap());
   }
   //read todos
   readTodos() async{
@@ -19,6 +19,10 @@ class TodoService{
   }
 
   updateTodo(Todo todo) async {
-    return await _repository.updateData('todos',todo.todoMap());
+    return 0;
+  }
+
+  deleteTodo(todoId) async {
+    return await _repository.deleteData("todos", todoId);
   }
 }

@@ -26,7 +26,7 @@ class homePage extends StatefulWidget {
 class _homePageState extends State<homePage> {
   String filterType = "Monthly";
   DateTime today = new DateTime.now();
-  String taskPop= "close";
+  String taskPop = "close";
   var monthnames = [
     "JAN",
     "FEB",
@@ -43,126 +43,132 @@ class _homePageState extends State<homePage> {
   ];
   CalendarController ctrlr = new CalendarController();
 
-  var _TodoTitleController=TextEditingController();
+  var _TodoTitleController = TextEditingController();
 
-  var _TodoDescriptionController= TextEditingController();
+  var _TodoDescriptionController = TextEditingController();
 
-  var _TodoDateController=TextEditingController();
+  var _TodoDateController = TextEditingController();
 
-  var _todo=Todo();
-  var _todoService=TodoService();
+  var _todo = Todo();
+  var _todoService = TodoService();
 
-  final GlobalKey<ScaffoldState>_globalKey = GlobalKey<ScaffoldState>();
-  DateTime _dateTime=DateTime.now();
+  final GlobalKey<ScaffoldState> _globalKey = GlobalKey<ScaffoldState>();
+  DateTime _dateTime = DateTime.now();
 
   var todo;
 
-  var _editTodoTitleController=TextEditingController();
+  var _editTodoTitleController = TextEditingController();
 
-  var _editTodoDateController=TextEditingController();
+  var _editTodoDateController = TextEditingController();
 
-  var _editTodoDescriptionController= TextEditingController();
+  var _editTodoDescriptionController = TextEditingController();
 
-
-  _selectedTodoDate(BuildContext context) async{
-    var _pickedDate= await showDatePicker(context: context, initialDate: _dateTime, firstDate: DateTime(2000), lastDate: DateTime(2100));
-    if(_pickedDate!=null){
+  _selectedTodoDate(BuildContext context) async {
+    var _pickedDate = await showDatePicker(
+        context: context,
+        initialDate: _dateTime,
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2100));
+    if (_pickedDate != null) {
       setState(() {
-        _dateTime=_pickedDate;
-        _TodoDateController.text=DateFormat('yyyy-MM-dd').format(_pickedDate);
+        _dateTime = _pickedDate;
+        _TodoDateController.text = DateFormat('yyyy-MM-dd').format(_pickedDate);
       });
     }
   }
-  _showSuccessSnackBar(message){
-    var _snackBar=SnackBar(content: message);
+
+  _showSuccessSnackBar(message) {
+    var _snackBar = SnackBar(content: message);
     _globalKey.currentState.showSnackBar(_snackBar);
   }
+
   // TodoService _todoService;
 
   List<Todo> _todoList = [];
-@override
-  initState(){
+
+  @override
+  initState() {
     super.initState();
     getAllTodos();
   }
 
-  getAllTodos() async{
-    _todoService=TodoService();
-    _todoList= [];
+  getAllTodos() async {
+    _todoService = TodoService();
+    _todoList = [];
 
-    var todos= await _todoService.readTodos();
+    var todos = await _todoService.readTodos();
 
-    todos.forEach((todo){
-    setState(() {
-      var model=Todo();
-      model.id=todo['id'];
-      model.title=todo['title'];
-      model.description=todo['description'];
-      model.todoDate=todo['todoDate'];
-      _todoList.add(model);
-    });
+    todos.forEach((todo) {
+      setState(() {
+        var model = Todo();
+        model.id = todo['id'];
+        model.title = todo['title'];
+        model.description = todo['description'];
+        model.todoDate = todo['todoDate'];
+        _todoList.add(model);
+      });
     });
   }
-  _editTodo(BuildContext context,todoId) async
-  {
+
+  _editTodo(BuildContext context, todoId) async {
     todo = await _todoService.readTodoById(todoId);
     setState(() {
-    _editTodoTitleController.text=todo[0]['title']??'No title';
-    _editTodoDescriptionController.text=todo[0]['description']?? 'No description';
-    _editTodoDateController.text=todo[0]['todoDate']?? 'No date';
+      _editTodoTitleController.text = todo[0]['title'] ?? 'No title';
+      _editTodoDescriptionController.text =
+          todo[0]['description'] ?? 'No description';
+      _editTodoDateController.text = todo[0]['todoDate'] ?? 'No date';
     });
     _editFormDialog(context);
   }
-  _editFormDialog(BuildContext context){
+
+  _editFormDialog(BuildContext context) {
     return showGeneralDialog(
         context: context,
         barrierDismissible: true,
-        barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+        barrierLabel:
+            MaterialLocalizations.of(context).modalBarrierDismissLabel,
         barrierColor: Colors.black,
         transitionDuration: Duration(microseconds: 200),
-        pageBuilder: (BuildContext context, Animation first,
-            Animation second){
+        pageBuilder: (BuildContext context, Animation first, Animation second) {
           return Scaffold(
               appBar: AppBar(
-                title:Text("Edit Todo form"),
+                title: Text("Edit Todo form"),
               ),
-              body:Padding(
+              body: Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Column(
                   children: <Widget>[
                     TextField(
-                      controller:_editTodoTitleController=TextEditingController(),
+                      controller: _editTodoTitleController =
+                          TextEditingController(),
                       decoration: InputDecoration(
-                          labelText:"Title",
-                          hintText: 'Write Todo Title'
-                      ),
+                          labelText: "Title", hintText: 'Write Todo Title'),
                     ),
                     TextField(
-                      controller:_editTodoDescriptionController=TextEditingController(),
+                      controller: _editTodoDescriptionController =
+                          TextEditingController(),
                       decoration: InputDecoration(
-                          labelText:"Description",
-                          hintText: 'Write Description of task'
-                      ),
+                          labelText: "Description",
+                          hintText: 'Write Description of task'),
                     ),
                     TextField(
-                      controller:_editTodoDateController=TextEditingController(),
+                      controller: _editTodoDateController =
+                          TextEditingController(),
                       decoration: InputDecoration(
-                          labelText:"Date",
+                          labelText: "Date",
                           hintText: 'Pick a date',
                           prefixIcon: InkWell(
-                            onTap: (){
+                            onTap: () {
                               _selectedTodoDate(context);
                             },
                             child: Icon(Icons.calendar_today),
-                          )
-
-                      ),
+                          )),
                     ),
                     SizedBox(
                       height: 40,
                     ),
                     ElevatedButton(
-                      onPressed: () async{
+                      onPressed: () async {
                         // var todoObject=Todo();
                         //
                         // todoObject.title=_TodoTitleController.text;
@@ -171,31 +177,29 @@ class _homePageState extends State<homePage> {
                         // todoObject.todoDate=_TodoDateController.text;
                         //
                         // var _todoService=TodoService();
-                        _todo.id=todo[0]['id'];
-                        _todo.title=_editTodoTitleController.text;
-                        _todo.description=_editTodoDescriptionController.text;
-                        _todo.todoDate=_editTodoDateController.text;
+                        _todo.id = todo[0]['id'];
+                        _todo.title = _editTodoTitleController.text;
+                        _todo.description = _editTodoDescriptionController.text;
+                        _todo.todoDate = _editTodoDateController.text;
 
-                        var result= await _todoService.updateTodo(_todo);
+                        var result = await _todoService.updateTodo(_todo);
 
-                        if(result > 0){
-                          _showSuccessSnackBar(Text("Task successfully created"));
+                        if (result > 0) {
+                          _showSuccessSnackBar(
+                              Text("Task successfully created"));
                         }
                         print(result);
                       },
                       child: Text('Update'),
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue
-                      ),
+                      style: ElevatedButton.styleFrom(primary: Colors.blue),
                     )
-
                   ],
                 ),
-              )
-          );
-        }
-    );
+              ));
+        });
   }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -222,7 +226,6 @@ class _homePageState extends State<homePage> {
                   )
                 ],
               ),
-
               Container(
                 height: 70,
                 color: Color(0xff000000),
@@ -286,76 +289,88 @@ class _homePageState extends State<homePage> {
               ),
               (filterType == "Monthly")
                   ? TableCalendar(
-                calendarController: ctrlr,
-                startingDayOfWeek: StartingDayOfWeek.sunday,
-                initialCalendarFormat: CalendarFormat.week,
-              )
+                      calendarController: ctrlr,
+                      startingDayOfWeek: StartingDayOfWeek.sunday,
+                      initialCalendarFormat: CalendarFormat.week,
+                    )
                   : Container(),
               Expanded(
                   child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-
-                        SizedBox(
-                          height: 10,
-                        ),
-
-                        Container(
-                          padding: EdgeInsets.all(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Today ${monthnames[today.month - 1]}, ${today.day} ${today.year}",
-                                style: TextStyle(fontSize: 18, color: Colors.grey),
-                              )
-                            ],
-                          ),
-                        ),
-                        // taskWidget(Colors.green, "Meeting with chuddy Buddies",
-                        //     "9:00 P.M Sunday"),
-                        // taskWidget(Colors.red, "Meeting with Sir Mohsin ",
-                        //     "3: 00 P.M Wednesday"),
-                        // taskWidget(
-                        //     Colors.blue, "Meeting with Cat", "9:00 P.M Everyday"),
-                        Flexible(
-                          fit:FlexFit.loose,
-                            child:SizedBox(
-                              height:450,
-                              child: ListView.builder(
-                                  itemCount: _todoList.length,
-                                  shrinkWrap: true,
-                                  itemBuilder: (context,index){
-                                return Padding(
-                                  padding: const EdgeInsets.only(top: 8.0,left: 8.0,right: 8.0),
-                                  child: Card(
-                                  elevation: 8,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(0)
-                                  ),
-                                  child: ListTile(
-                                    leading:IconButton(icon:Icon(Icons.edit),onPressed: (){
-                                      _editTodo(context, _todoList[index].id);
-                                    }),
-                                    title: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                      Text(_todoList[index].title ?? 'No title'),
-                                        IconButton(icon:Icon(Icons.delete,color: Colors.red,),onPressed: (){})
-                                    ],
-                                  ),
-                                    subtitle: Text(_todoList[index].description ?? 'No Description'),
-                                    trailing: Text(_todoList[index].todoDate ?? 'No Date'),
-                                  )
-                              ),
-                                );
-                          }),
-                            ),
-                          ),
-                      ],
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      height: 10,
                     ),
-                  )),
+
+                    Container(
+                      padding: EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Today ${monthnames[today.month - 1]}, ${today.day} ${today.year}",
+                            style: TextStyle(fontSize: 18, color: Colors.grey),
+                          )
+                        ],
+                      ),
+                    ),
+                    // taskWidget(Colors.green, "Meeting with chuddy Buddies",
+                    //     "9:00 P.M Sunday"),
+                    // taskWidget(Colors.red, "Meeting with Sir Mohsin ",
+                    //     "3: 00 P.M Wednesday"),
+                    // taskWidget(
+                    //     Colors.blue, "Meeting with Cat", "9:00 P.M Everyday"),
+                    Flexible(
+                      fit: FlexFit.loose,
+                      child: SizedBox(
+                        height: 450,
+                        child: ListView.builder(
+                            itemCount: _todoList.length,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 8.0, left: 8.0, right: 8.0),
+                                child: Card(
+                                    elevation: 8,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(0)),
+                                    child: ListTile(
+                                      leading: IconButton(
+                                          icon: Icon(Icons.edit),
+                                          onPressed: () {
+                                            _editTodo(
+                                                context, _todoList[index].id);
+                                          }),
+                                      title: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Text(_todoList[index].title ??
+                                              'No title'),
+                                          IconButton(
+                                              icon: Icon(
+                                                Icons.delete,
+                                                color: Colors.red,
+                                              ),
+                                              onPressed: () {})
+                                        ],
+                                      ),
+                                      subtitle: Text(
+                                          _todoList[index].description ??
+                                              'No Description'),
+                                      trailing: Text(
+                                          _todoList[index].todoDate ??
+                                              'No Date'),
+                                    )),
+                              );
+                            }),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
               Container(
                 height: 100,
                 child: Stack(
@@ -415,86 +430,87 @@ class _homePageState extends State<homePage> {
                       left: 0,
                       right: 0,
                       child: InkWell(
-                        onTap:(){
+                        onTap: () {
                           showGeneralDialog(
                               context: context,
                               barrierDismissible: true,
-                              barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+                              barrierLabel: MaterialLocalizations.of(context)
+                                  .modalBarrierDismissLabel,
                               barrierColor: Colors.black,
                               transitionDuration: Duration(microseconds: 200),
-                              pageBuilder: (BuildContext context, Animation first,
-                                  Animation second){
+                              pageBuilder: (BuildContext context,
+                                  Animation first, Animation second) {
                                 return Scaffold(
                                     appBar: AppBar(
-                                      title:Text("Create Todo"),
+                                      title: Text("Create Todo"),
                                     ),
-                                    body:Padding(
+                                    body: Padding(
                                       padding: EdgeInsets.all(16.0),
                                       child: Column(
                                         children: <Widget>[
                                           TextField(
-                                            controller:_TodoTitleController=TextEditingController(),
+                                            controller: _TodoTitleController =
+                                                TextEditingController(),
                                             decoration: InputDecoration(
-                                                labelText:"Title",
-                                                hintText: 'Write Todo Title'
-                                            ),
+                                                labelText: "Title",
+                                                hintText: 'Write Todo Title'),
                                           ),
                                           TextField(
-                                            controller:_TodoDescriptionController=TextEditingController(),
+                                            controller:
+                                                _TodoDescriptionController =
+                                                    TextEditingController(),
                                             decoration: InputDecoration(
-                                                labelText:"Description",
-                                                hintText: 'Write Description of task'
-                                            ),
+                                                labelText: "Description",
+                                                hintText:
+                                                    'Write Description of task'),
                                           ),
                                           TextField(
-                                            controller:_TodoDateController=TextEditingController(),
+                                            controller: _TodoDateController =
+                                                TextEditingController(),
                                             decoration: InputDecoration(
-                                                labelText:"Date",
+                                                labelText: "Date",
                                                 hintText: 'Pick a date',
                                                 prefixIcon: InkWell(
-                                                  onTap: (){
+                                                  onTap: () {
                                                     _selectedTodoDate(context);
                                                   },
-                                                  child: Icon(Icons.calendar_today),
-                                                )
-
-                                            ),
+                                                  child: Icon(
+                                                      Icons.calendar_today),
+                                                )),
                                           ),
                                           SizedBox(
                                             height: 40,
                                           ),
                                           ElevatedButton(
-                                              onPressed: () async{
-                                                var todoObject=Todo();
+                                            onPressed: () async {
+                                              var todoObject = Todo();
 
-                                                todoObject.title=_TodoTitleController.text;
-                                                todoObject.description=_TodoDescriptionController.text;
-                                                todoObject.isFinished=0;
-                                                todoObject.todoDate=_TodoDateController.text;
+                                              todoObject.title =
+                                                  _TodoTitleController.text;
+                                              todoObject.description =
+                                                  _TodoDescriptionController
+                                                      .text;
+                                              todoObject.todoDate =
+                                                  _TodoDateController.text;
+                                              var _todoService = TodoService();
+                                              var result = await _todoService
+                                                  .saveTodo(todoObject);
 
-                                                var _todoService=TodoService();
-                                                var result= await _todoService.saveTodo(todoObject);
+                                              if (result > 0) {
+                                                _showSuccessSnackBar(Text(
+                                                    "Task successfully created"));
+                                              }
 
-                                                if(result > 0){
-                                                  _showSuccessSnackBar(Text("Task successfully created"));
-                                                }
-
-                                                print(result);
-
-                                              },
-                                              child: Text('Save'),
+                                              print(result);
+                                            },
+                                            child: Text('Save'),
                                             style: ElevatedButton.styleFrom(
-                                              primary: Colors.blue
-                                            ),
-                                              )
-
+                                                primary: Colors.blue),
+                                          )
                                         ],
                                       ),
-                                    )
-                                );
-                              }
-                          );
-
+                                    ));
+                              });
                         },
                         child: Container(
                           height: 80,
@@ -515,13 +531,12 @@ class _homePageState extends State<homePage> {
                                 color: Colors.white,
                               ),
                             ),
-                            ),
                           ),
                         ),
                       ),
+                    ),
                   ],
                 ),
-
               ),
             ],
           ),
@@ -531,9 +546,13 @@ class _homePageState extends State<homePage> {
   }
 
   openNewTask() {}
+
   openNewMeeting() {}
+
   openNewQuiz() {}
+
   openNewProject() {}
+
   openTaskPop() {
     taskPop = "open";
     setState(() {});
